@@ -1,0 +1,24 @@
+import type { AssistantRequest, AssistantResult } from "./types";
+
+/**
+ * The browser's only point of contact with the assistant — a plain fetch to our own
+ * first-party route. This file has no knowledge of any AI vendor; that's handled
+ * entirely server-side, so no provider name, SDK, or key ever needs to reach the client.
+ */
+export async function requestAssistantReply(payload: AssistantRequest): Promise<AssistantResult> {
+  try {
+    const response = await fetch("/api/assistant", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = (await response.json()) as AssistantResult;
+    return data;
+  } catch {
+    return {
+      status: "error",
+      message: "Couldn't reach the assistant. Check your connection and try again.",
+    };
+  }
+}
