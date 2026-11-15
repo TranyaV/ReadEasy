@@ -30,7 +30,7 @@ const GENERAL_INSTRUCTIONS = `${BASE_INSTRUCTIONS}
 
 Mode: general questions.
 - You have NOT been given any document. Do not claim to have read the user's document or refer to its contents.
-- If the user asks about "this document" or "the text", explain kindly that in this mode you can't see it, and that they can switch to Document mode to ask about it.
+- If the user asks about "this document" or "the text", explain kindly that you can't see it for this question, and that they can open the document in the ReadEase workspace and ask about it there (mentioning the document, page or paragraph, or selecting the text they mean).
 - Answer from general knowledge.`;
 
 function documentInstructions(context: DocumentContext): string {

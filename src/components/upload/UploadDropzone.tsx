@@ -1,8 +1,7 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
-import { AlertCircle, FileText, Image as ImageIcon, UploadCloud } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { AlertCircle, FileUp, FileText } from "lucide-react";
 
 type UploadDropzoneProps = {
   onFileSelected: (file: File) => void;
@@ -38,22 +37,29 @@ export function UploadDropzone({ onFileSelected, errorMessage }: UploadDropzoneP
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`flex flex-col items-center gap-4 rounded-3xl border-2 border-dashed px-6 py-12 text-center transition-colors duration-200 ${
-          isDragging ? "border-forest bg-sage-soft/60" : "border-border bg-white/40"
+        className={`flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-colors duration-200 sm:py-14 ${
+          isDragging ? "border-accent bg-accent-soft/60" : "border-accent/40 bg-surface"
         }`}
       >
-        <div className="flex items-center gap-3 text-forest">
-          <UploadCloud className="h-7 w-7" />
-          <FileText className="h-6 w-6 opacity-70" />
-          <ImageIcon className="h-6 w-6 opacity-70" />
-        </div>
+        <span className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-accent-soft text-accent">
+          <FileText className="h-10 w-10" strokeWidth={1.5} aria-hidden="true" />
+          <span className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-accent text-on-accent ring-4 ring-surface">
+            <FileUp className="h-4 w-4" aria-hidden="true" />
+          </span>
+        </span>
         <div>
-          <p className="font-medium text-foreground">Drag and drop a document or image</p>
-          <p className="text-sm text-foreground/60">Supports PDF, PNG and JPG files</p>
+          <p className="text-xl font-semibold text-foreground sm:text-2xl">Drag and drop your file here</p>
+          <p className="mt-1 text-muted">Or choose a file from your device</p>
         </div>
-        <Button variant="secondary" size="md" onClick={() => inputRef.current?.click()}>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-[15px] font-medium text-on-accent shadow-sm transition-colors hover:bg-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2"
+        >
+          <FileText className="h-4 w-4" aria-hidden="true" />
           Browse files
-        </Button>
+        </button>
+        <p className="text-sm text-muted">Supports PDF, PNG, JPG and JPEG (up to 25 MB)</p>
         <input
           ref={inputRef}
           type="file"
@@ -63,8 +69,8 @@ export function UploadDropzone({ onFileSelected, errorMessage }: UploadDropzoneP
         />
       </div>
       {errorMessage && (
-        <p className="flex items-center gap-2 text-sm text-error">
-          <AlertCircle className="h-4 w-4" />
+        <p className="flex items-center gap-2 text-sm text-error" role="alert">
+          <AlertCircle className="h-4 w-4 shrink-0" />
           {errorMessage}
         </p>
       )}

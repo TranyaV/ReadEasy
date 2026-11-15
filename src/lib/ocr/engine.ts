@@ -6,7 +6,20 @@ import { isImageFile, isPdfFile, validateUploadFile } from "./validate";
 
 export type ProgressCallback = (progress: ExtractionProgress) => void;
 
+/**
+ * Joins per-page OCR output into one text, exactly as the original single-string
+ * extraction did. Kept for callers that only need the combined text.
+ */
 export async function extractTextFromFile(file: File, onProgress: ProgressCallback): Promise<string> {
+  const pages = await extractPagesFromFile(file, onProgress);
+  return pages.filter(Boolean).join("\n\n");
+}
+
+/**
+ * OCRs a file and returns the recognised text of each page (one entry for an image).
+ * Empty pages are kept as "" so page numbers stay aligned with the original file.
+ */
+export async function extractPagesFromFile(file: File, onProgress: ProgressCallback): Promise<string[]> {
   const validationError = validateUploadFile(file);
   if (validationError) {
     throw new OcrError(validationError);
@@ -47,7 +60,7 @@ export async function extractTextFromFile(file: File, onProgress: ProgressCallba
       if (!text) {
         throw new OcrError("No readable text was found in this image.");
       }
-      return text;
+      return [text];
     }
 
     if (!isPdfFile(file)) {
@@ -81,11 +94,10 @@ export async function extractTextFromFile(file: File, onProgress: ProgressCallba
       await pdf.loadingTask.destroy();
     }
 
-    const combined = pageTexts.filter(Boolean).join("\n\n");
-    if (!combined) {
+    if (!pageTexts.some(Boolean)) {
       throw new OcrError("No readable text was found in this PDF.");
     }
-    return combined;
+    return pageTexts;
   } finally {
     await worker.terminate();
   }

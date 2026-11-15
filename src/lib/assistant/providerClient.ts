@@ -1,5 +1,7 @@
 import type { AssistantRequest, AssistantResult } from "./types";
 
+const RATE_LIMIT_MESSAGE = "Too many requests. Please wait a minute and try again.";
+
 /**
  * The browser's only point of contact with the assistant — a plain fetch to our own
  * first-party route. This file has no knowledge of any AI vendor; that's handled
@@ -12,6 +14,11 @@ export async function requestAssistantReply(payload: AssistantRequest): Promise<
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
+    // Rate-limited (e.g. by the hosting firewall) — the body may not be our JSON.
+    if (response.status === 429) {
+      return { status: "error", message: RATE_LIMIT_MESSAGE };
+    }
 
     const data = (await response.json()) as AssistantResult;
     return data;

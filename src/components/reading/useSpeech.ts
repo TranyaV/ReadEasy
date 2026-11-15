@@ -19,7 +19,7 @@ function getSpeechSupportServerSnapshot(): boolean {
 }
 
 /** SSR-safe browser-capability check: false during server rendering/static generation, corrected after mount. */
-function useIsSpeechSupported(): boolean {
+export function useIsSpeechSupported(): boolean {
   return useSyncExternalStore(
     subscribeToNothing,
     getSpeechSupportSnapshot,
@@ -66,7 +66,7 @@ function subscribeToVoices(onStoreChange: () => void) {
 }
 
 /** Browser voices load asynchronously in some browsers; this stays in sync via the voiceschanged event. */
-function useAvailableVoices(): SpeechSynthesisVoice[] {
+export function useAvailableVoices(): SpeechSynthesisVoice[] {
   return useSyncExternalStore(subscribeToVoices, getVoicesSnapshot, getVoicesServerSnapshot);
 }
 
@@ -104,13 +104,16 @@ const PREVIEW_PHRASE = "This is how this voice sounds when reading your document
  * at all times, so the text to read must be fetched fresh at the moment Play is pressed,
  * never memoized against a prop that could already be stale by the time it's used.
  */
-export function useSpeech(getText: () => string): UseSpeechResult {
+export function useSpeech(
+  getText: () => string,
+  initial: { voiceURI?: string | null; rate?: number } = {},
+): UseSpeechResult {
   const isSupported = useIsSpeechSupported();
   const sentencesRef = useRef<string[]>([]);
 
   const [state, setState] = useState<SpeechPlaybackState>("idle");
   const [activeSentenceIndex, setActiveSentenceIndex] = useState<number | null>(null);
-  const [rate, setRateValue] = useState(1);
+  const [rate, setRateValue] = useState(() => Math.min(MAX_RATE, Math.max(MIN_RATE, initial.rate ?? 1)));
   const rateRef = useRef(rate);
   useEffect(() => {
     rateRef.current = rate;
@@ -118,7 +121,7 @@ export function useSpeech(getText: () => string): UseSpeechResult {
 
   const rawVoices = useAvailableVoices();
   const voices = useMemo(() => sortVoicesForDisplay(rawVoices), [rawVoices]);
-  const [selectedVoiceURI, setSelectedVoiceURI] = useState<string | null>(null);
+  const [selectedVoiceURI, setSelectedVoiceURI] = useState<string | null>(initial.voiceURI ?? null);
   const selectedVoice = useMemo(
     () => resolveVoice(voices, selectedVoiceURI),
     [voices, selectedVoiceURI],

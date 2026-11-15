@@ -9,3 +9,7 @@ export function hasDocumentConsent(): boolean {
 export function grantDocumentConsent(): void {
   sessionStorage.setItem(CONSENT_KEY, "granted");
 }
+
+export function revokeDocumentConsent(): void {
+  sessionStorage.removeItem(CONSENT_KEY);
+}

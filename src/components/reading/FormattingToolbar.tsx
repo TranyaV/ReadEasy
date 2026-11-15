@@ -29,8 +29,6 @@ export type FormattingToolbarActions = {
   toggleUnderline: () => void;
   setAlignment: (align: AlignOption) => void;
   setHeading: (heading: HeadingOption) => void;
-  setFontFamily: (family: string) => void;
-  setFontSize: (size: string) => void;
   insertBulletedList: () => void;
   insertNumberedList: () => void;
   undo: () => void;
@@ -42,6 +40,8 @@ type FormattingToolbarProps = {
   actions: FormattingToolbarActions;
   isFindReplaceOpen: boolean;
   onToggleFindReplace: () => void;
+  /** Extra controls at the end of the toolbar. */
+  end?: ReactNode;
 };
 
 const HEADING_OPTIONS: { value: HeadingOption; label: string }[] = [
@@ -51,30 +51,18 @@ const HEADING_OPTIONS: { value: HeadingOption; label: string }[] = [
   { value: "heading3", label: "Heading 3" },
 ];
 
-const FONT_FAMILY_OPTIONS = [
-  { label: "Default", value: "var(--font-serif)" },
-  { label: "Sans", value: "var(--font-sans)" },
-  { label: "Accessible", value: "var(--font-accessible)" },
-  { label: "Georgia", value: "Georgia, serif" },
-  { label: "Times New Roman", value: "'Times New Roman', Times, serif" },
-  { label: "Arial", value: "Arial, Helvetica, sans-serif" },
-  { label: "Courier New", value: "'Courier New', Courier, monospace" },
-];
-
-const FONT_SIZE_OPTIONS = ["12", "14", "16", "18", "20", "24", "28", "32", "40"];
-
 const baseButton =
-  "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent text-foreground/70 transition-colors hover:border-border hover:bg-sage-soft/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest/40 disabled:pointer-events-none disabled:opacity-40";
-const activeButton = "border-border bg-forest/10 text-forest";
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-foreground/75 transition-colors hover:bg-subtle hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:pointer-events-none disabled:opacity-40";
+const activeButton = "bg-accent-soft text-accent";
 
 const selectClasses =
-  "h-8 shrink-0 rounded-md border border-border bg-white/70 px-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest/40";
+  "h-9 shrink-0 rounded-lg border border-transparent bg-transparent px-2 text-sm text-foreground hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40";
 
 function Divider() {
   return <span className="mx-1 h-5 w-px shrink-0 self-center bg-border" aria-hidden="true" />;
 }
 
-function ToolbarButton({
+export function ToolbarButton({
   active,
   label,
   onClick,
@@ -105,13 +93,23 @@ export function FormattingToolbar({
   actions,
   isFindReplaceOpen,
   onToggleFindReplace,
+  end,
 }: FormattingToolbarProps) {
   return (
     <div
       role="toolbar"
       aria-label="Text formatting"
-      className="flex items-center gap-1 overflow-x-auto border border-border bg-white/70 px-2 py-1.5"
+      className="sticky top-0 z-20 flex items-center gap-1 overflow-x-auto rounded-t-2xl border border-border bg-surface px-2 py-1.5"
     >
+      <ToolbarButton label="Undo" onClick={actions.undo}>
+        <Undo2 className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton label="Redo" onClick={actions.redo}>
+        <Redo2 className="h-4 w-4" />
+      </ToolbarButton>
+
+      <Divider />
+
       <select
         aria-label="Heading style"
         defaultValue="paragraph"
@@ -122,32 +120,6 @@ export function FormattingToolbar({
         {HEADING_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
-          </option>
-        ))}
-      </select>
-
-      <select
-        aria-label="Font family"
-        defaultValue={FONT_FAMILY_OPTIONS[0].value}
-        onChange={(event) => actions.setFontFamily(event.target.value)}
-        className={`${selectClasses} w-28`}
-      >
-        {FONT_FAMILY_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-
-      <select
-        aria-label="Font size"
-        defaultValue="16"
-        onChange={(event) => actions.setFontSize(`${event.target.value}px`)}
-        className={`${selectClasses} w-16`}
-      >
-        {FONT_SIZE_OPTIONS.map((size) => (
-          <option key={size} value={size}>
-            {size}
           </option>
         ))}
       </select>
@@ -199,18 +171,16 @@ export function FormattingToolbar({
 
       <Divider />
 
-      <ToolbarButton label="Undo" onClick={actions.undo}>
-        <Undo2 className="h-4 w-4" />
-      </ToolbarButton>
-      <ToolbarButton label="Redo" onClick={actions.redo}>
-        <Redo2 className="h-4 w-4" />
-      </ToolbarButton>
-
-      <Divider />
-
       <ToolbarButton active={isFindReplaceOpen} label="Find and replace" onClick={onToggleFindReplace}>
         <Search className="h-4 w-4" />
       </ToolbarButton>
+
+      {end && (
+        <>
+          <Divider />
+          {end}
+        </>
+      )}
     </div>
   );
 }

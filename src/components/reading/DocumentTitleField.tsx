@@ -18,7 +18,8 @@ export function DocumentTitleField({ value, onChange, onCommit }: DocumentTitleF
       }}
       placeholder="Untitled document"
       aria-label="Document title"
-      className="w-full max-w-md rounded border border-transparent bg-transparent font-serif text-2xl font-semibold text-foreground placeholder:text-foreground/40 hover:border-border focus:border-forest focus:outline-none focus-visible:ring-2 focus-visible:ring-forest/40"
+      maxLength={200}
+      className="w-full min-w-0 max-w-md truncate rounded-lg border border-transparent bg-transparent px-2 py-1 text-[15px] font-medium text-foreground placeholder:text-muted hover:border-border focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
     />
   );
 }

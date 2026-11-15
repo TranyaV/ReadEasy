@@ -23,6 +23,8 @@ const ALLOWED_TAGS = new Set([
   "BR",
 ]);
 
+const PAGE_TAGS = new Set(["P", "DIV", "H1", "H2", "H3", "UL", "OL", "LI"]);
+
 const ALLOWED_STYLE_PROPERTIES = new Set(["font-family", "font-size", "text-align"]);
 
 function sanitizeStyle(value: string): string | null {
@@ -53,11 +55,16 @@ function sanitizeInPlace(root: HTMLElement): void {
     }
 
     const style = element.getAttribute("style");
+    const page = element.getAttribute("data-page");
     Array.from(element.attributes).forEach((attribute) => element.removeAttribute(attribute.name));
 
     if (style) {
       const sanitized = sanitizeStyle(style);
       if (sanitized) element.setAttribute("style", sanitized);
+    }
+    // Page markers from OCR (which original page a block came from) — digits only.
+    if (page && PAGE_TAGS.has(element.tagName) && /^\d{1,5}$/.test(page)) {
+      element.setAttribute("data-page", page);
     }
   }
 }

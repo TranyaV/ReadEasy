@@ -107,3 +107,18 @@ export function wrapPlainTextAsHtml(paragraphs: string[]): string {
   if (paragraphs.length === 0) return "<p><br></p>";
   return paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("");
 }
+
+/**
+ * Seeds the editor from per-page OCR output. Each paragraph carries the page it came
+ * from as data-page, which survives sanitizing and is copied by the browser when a
+ * paragraph is split while editing — so page navigation keeps working after edits.
+ */
+export function wrapPagesAsHtml(pages: string[][]): string {
+  const blocks: string[] = [];
+  pages.forEach((paragraphs, index) => {
+    for (const paragraph of paragraphs) {
+      blocks.push(`<p data-page="${index + 1}">${escapeHtml(paragraph)}</p>`);
+    }
+  });
+  return blocks.length > 0 ? blocks.join("") : "<p><br></p>";
+}

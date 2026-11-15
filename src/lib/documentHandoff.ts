@@ -3,6 +3,8 @@ import { useSyncExternalStore } from "react";
 const STORAGE_KEY = "eyeread:document";
 
 export type StoredDocument = {
+  /** Library (IndexedDB) id when the document lives in My Library; absent for the sample. */
+  documentId?: string;
   fileName: string | null;
   text: string;
   /** Sanitized rich-text HTML from the document editor, if the document has ever been formatted. */
@@ -22,12 +24,16 @@ export function clearDocumentForReading(): void {
 function parseStoredDocument(raw: string): StoredDocument | null {
   try {
     const parsed = JSON.parse(raw) as StoredDocument;
-    if (typeof parsed.text !== "string" || !parsed.text.trim()) return null;
+    if (typeof parsed.text !== "string") return null;
+    const documentId = typeof parsed.documentId === "string" && parsed.documentId ? parsed.documentId : undefined;
+    // A library document may legitimately be empty (a new blank document); anything
+    // else without text is treated as no document.
+    if (!parsed.text.trim() && !documentId) return null;
 
     const html = typeof parsed.html === "string" ? parsed.html : undefined;
     const title = typeof parsed.title === "string" ? parsed.title : undefined;
 
-    return { fileName: parsed.fileName ?? null, text: parsed.text, html, title };
+    return { documentId, fileName: parsed.fileName ?? null, text: parsed.text, html, title };
   } catch {
     return null;
   }

@@ -1,4 +1,4 @@
-import { Geist, Lora, Atkinson_Hyperlegible } from "next/font/google";
+import { Atkinson_Hyperlegible, Geist, Lexend, Lora } from "next/font/google";
 
 export const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,4 +15,10 @@ export const atkinsonHyperlegible = Atkinson_Hyperlegible({
   variable: "--font-atkinson",
   subsets: ["latin"],
   weight: ["400", "700"],
+});
+
+/** Lexend was designed to reduce visual stress and improve reading fluency. */
+export const lexend = Lexend({
+  variable: "--font-lexend",
+  subsets: ["latin"],
 });

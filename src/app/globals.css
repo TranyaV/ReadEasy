@@ -1,32 +1,79 @@
 @import "tailwindcss";
 
+/* `dark:` utilities follow the Reading Profile appearance (the .dark class), not the OS. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ReadEase palette — light neutral surfaces, charcoal text, one restrained blue accent. */
 :root {
-  --color-ivory: #faf6ec;
-  --color-charcoal: #2a2924;
-  --color-forest: #1f3a2e;
-  --color-forest-dark: #16291f;
-  --color-sage: #c7d0bc;
-  --color-sage-soft: #e6e9dd;
-  --color-border: rgba(42, 41, 36, 0.12);
-  --color-clay: #9a4b3a;
+  --re-page: #f6f8fb;
+  --re-surface: #ffffff;
+  --re-ink: #1c2230;
+  --re-muted: #5a6475;
+  --re-line: #e1e6ee;
+  --re-accent: #1f5fe0;
+  --re-accent-strong: #184bb5;
+  --re-accent-soft: #e8effd;
+  --re-subtle: #eef2f7;
+  --re-error: #b4361f;
+  --re-success: #1d7a46;
+  --re-on-accent: #ffffff;
+}
+
+/* App-wide dark appearance (Reading Profile → Appearance). Only the palette changes. */
+:root.dark {
+  color-scheme: dark;
+  --re-page: #12151b;
+  --re-surface: #1a1e26;
+  --re-ink: #e6e9ef;
+  --re-muted: #9aa3b2;
+  --re-line: #2c323d;
+  --re-accent: #6b9bff;
+  --re-accent-strong: #8fb2ff;
+  --re-accent-soft: #1f2d48;
+  --re-subtle: #232834;
+  --re-error: #ff8a73;
+  --re-success: #5fd394;
+  --re-on-accent: #0b1220;
 }
 
 @theme inline {
-  --color-background: var(--color-ivory);
-  --color-foreground: var(--color-charcoal);
-  --color-forest: var(--color-forest);
-  --color-forest-dark: var(--color-forest-dark);
-  --color-sage: var(--color-sage);
-  --color-sage-soft: var(--color-sage-soft);
-  --color-border: var(--color-border);
-  --color-error: var(--color-clay);
+  --color-background: var(--re-page);
+  --color-surface: var(--re-surface);
+  --color-foreground: var(--re-ink);
+  --color-muted: var(--re-muted);
+  --color-border: var(--re-line);
+  --color-accent: var(--re-accent);
+  --color-accent-strong: var(--re-accent-strong);
+  --color-accent-soft: var(--re-accent-soft);
+  --color-subtle: var(--re-subtle);
+  --color-error: var(--re-error);
+  --color-success: var(--re-success);
+  --color-on-accent: var(--re-on-accent);
+
+  /* Legacy token names, kept as aliases so existing components adopt the new palette. */
+  --color-forest: var(--re-accent);
+  --color-forest-dark: var(--re-accent-strong);
+  --color-sage: #d3dceb;
+  --color-sage-soft: var(--re-subtle);
+
   --font-sans: var(--font-geist-sans);
   --font-serif: var(--font-lora);
   --font-accessible: var(--font-atkinson);
+  --font-lexend: var(--font-lexend);
 }
 
 /* Adjustable spacing between document blocks (paragraphs/headings/lists), driven by the
    reading-personalisation sidebar via the --eyeread-paragraph-gap custom property. */
 .rich-document > * + * {
   margin-top: var(--eyeread-paragraph-gap, 24px);
+}
+
+/* Define mode: words are clickable for definitions instead of placing the caret. */
+.define-mode .rich-document {
+  cursor: help;
+}
+
+/* Page/heading jumps land below the sticky formatting toolbar. */
+.rich-document > * {
+  scroll-margin-top: 72px;
 }
