@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { buildDocumentContext } from "@/lib/assistant/buildDocumentContext";
 import { grantDocumentConsent, hasDocumentConsent } from "@/lib/assistant/consent";
 import { mentionsParagraph, needsDocumentContext } from "@/lib/assistant/contextRule";
@@ -92,6 +92,9 @@ export function useAssistantState(): { assistant: UseAssistantResult; registry: 
     setDocumentTitle(title);
   }, []);
 
+  // Stable across renders so document registration only re-runs on mount/unmount.
+  const registry = useMemo(() => ({ register, setTitle }), [register, setTitle]);
+
   async function performSend(content: string, withDocument: boolean) {
     const source = withDocument ? sourceRef.current : null;
     const userMessage: ChatMessage = { id: createMessageId(), role: "user", content, usedDocument: Boolean(source) };
@@ -176,7 +179,7 @@ export function useAssistantState(): { assistant: UseAssistantResult; registry: 
       hasDocument: documentTitle !== null,
       documentTitle,
     },
-    registry: { register, setTitle },
+    registry,
   };
 }
 
