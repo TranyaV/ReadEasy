@@ -67,7 +67,9 @@ export function useAssistant({
     appendMessage(targetMode, userMessage);
     setIsSending(true);
 
-    const turns = [...priorTurns, userMessage].map((message) => ({
+    // Error / not-configured notices are UI status messages, not things the assistant
+    // said, so they're never sent back as conversation history.
+    const turns = [...priorTurns.filter((message) => !message.kind), userMessage].map((message) => ({
       role: message.role,
       content: message.content,
     }));
